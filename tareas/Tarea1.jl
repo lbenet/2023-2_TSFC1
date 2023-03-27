@@ -1,7 +1,8 @@
 # # Tarea 1: Números duales
 
 #-
-# > Fecha de aceptación:
+# > Fecha de envío: 27 de marzo
+# > Fecha de aceptación: 31 de marzo
 
 #-
 # Antes de describir los *números duales* recordaremos primero algunas propiedades de los
