@@ -9,10 +9,10 @@
 # $F_\mu$ y sus iterados, o aplicaciones repetidas, es decir,
 # \begin{equation}
 # x_{n+1} = F_\mu (x_n).
-# \label{eq:DefMapeo}\tag{1}
+# \tag{1}
 # \end{equation}
 
-# En \eqref{eq:DefMapeo}, $\mu$ representa uno o varios parámetros que uno puede variar,
+# En (1), $\mu$ representa uno o varios parámetros que uno puede variar,
 # y $x_n$ representa
 # el estado del sistema al "tiempo discreto" $n$. La idea de introducir mapeos es evitar las
 # complicaciones que surgen al resolver ecuaciones diferenciales, lo que involucraría un
@@ -62,13 +62,13 @@
 # ecuación
 # \begin{equation*}
 # F_\mu(x) = x.
-# \label{eq:DefPtoFijo}\tag{2}
+# \tag{2}
 # \end{equation*}
 # En otras palabras, cada iterado coincide consigo mismo.
 
 # Por ejemplo, para el mapeo $G(x)=x^2-x-4$, los puntos fijos satisfacen $x^2-2x-4=0$, de
 # donde concluímos que hay dos soluciones, $x_\pm = 1\pm\sqrt{5}$.
-# Por otra parte, para $F(x) = x^2+1$ y $x\in\mathbb{R}$, la ecuación \eqref{eq:DefPtoFijo}
+# Por otra parte, para $F(x) = x^2+1$ y $x\in\mathbb{R}$, la ecuación (2)
 # lleva a $x^2+1=x$ que no tiene solución (en los reales), por lo que no hay puntos fijos.
 # De hecho, esta es la razón por la que todas las
 # órbitas divergen a $+\infty$. (Otra manera de formular esto último, menos rigurosa, es
@@ -123,11 +123,11 @@ G(1-sqrt(BigInt(5)))-(1-sqrt(BigInt(5)))
 # Un punto que pertenece a una órbita de periodo $n$ satisface la ecuación
 # \begin{equation*}
 # F^n(x_0) = x_0.
-# \label{eq:DefOrbPeriod}\tag{3}
+# \tag{3}
 # \end{equation*}
-# Claramente, de la ecuación \eqref{eq:DefOrbPeriod} concluimos que un punto de periodo
+# Claramente, de la ecuación (3) concluimos que un punto de periodo
 # $n$ del mapeo $F$ es un punto fijo (de periodo 1) del mapeo definido por la función $F^n$.
-# Además, la ecuación \eqref{eq:DefOrbPeriod} tiene *al menos* $n$ soluciones distintas.
+# Además, la ecuación (3) tiene *al menos* $n$ soluciones distintas.
 
 # Un punto $x_0$ se llama *eventualmente periódico* cuando sin ser punto fijo o periódico,
 # después de un cierto número *finito* de iteraciones, los iterados pertenecen a una
