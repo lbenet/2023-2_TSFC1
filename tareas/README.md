@@ -7,9 +7,10 @@ Las tareas deberán ser enviadas como *pull requests* (PR), que deberán ser ace
 Cada tarea incluye indicaciones precisas de qué archivos deben subir en el PR, que en general será en formato `.jl`, qué modificaciones tienen que hacer (en otros archivos) si esto es necesario.
 
 
-<!-- ## Fechas de entrega
+## Fechas de entrega
 
 |                   | Aceptación del PR  |         Estado         |
 |:------------------|:------------------:|:----------------------:|
-|        Tarea 1    |  14/10/2023        | Abierta    |
-| | | -->
+|        Tarea 1    |  24/03/2023        | Abierta    |
+|        Tarea 2    |  08/05/2023        | Abierta    |
+| | |
