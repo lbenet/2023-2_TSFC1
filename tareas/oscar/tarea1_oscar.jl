@@ -27,7 +27,6 @@
 # qué son $z$ y $z^\prime$ en términos de las componentes de $\overleftrightarrow{x}$ y
 # $\overleftrightarrow{y}$.
 
-# <div class="alert alert-warning">
 # Al desarrollar la ecuación $\overleftrightarrow{z} \cdot \overleftrightarrow{y} = \overleftrightarrow{x}$ tenemos los siguiente:
 # $$
 # \overleftrightarrow{z} \cdot \overleftrightarrow{y} = zy + \epsilon (zy^\prime + yz^\prime ) = x + \epsilon x^\prime
@@ -44,15 +43,12 @@
 # z & = & \dfrac{x}{y}\\
 # z^\prime & = & \dfrac{x^\prime y - xy^\prime}{y^{2}}
 # \end{eqnarray}
-# </div>
 
 # - De la expresión obtenida (y de las fórmulas anteriores), ¿qué podemos decir
 # (concluir o interpretar) sobre qué representa de $z^\prime$?
 
-# <div class="alert alert-warning">
 # La forma de $z^\prime$ recuerda mucho a la derivada de una división. Y analizando 
-# los demás resultados, parece que el nombre de <i>parte derivada de $\overleftrightarrow{z}$</i> resulta justamente de esta propiedad.
-# </div>
+# los demás resultados, el nombre de <i>parte derivada de $\overleftrightarrow{z}$</i> resulta justamente de esta propiedad.
 
 # ## Ejercicio 2
 
@@ -107,7 +103,7 @@ Dual(3, 2)
 -(x::Dual, y::Dual) = Dual(x.fun - y.fun, x.der - y.der)
 
 """
-Sobrecargamos la operación de resta (`-`) para dos números `Duales`. La operación que se realiza es la siguiente:
+Sobrecargamos la operación de multiplicación (`*`) para dos números `Duales`. La operación que se realiza es la siguiente:
 
 Dual(x₁, x₂) * Dual(y₁,y₂) = Dual(x₁*y₁, x₁*y₂ + y₁*x₂)
 
@@ -124,7 +120,7 @@ Dual(-2, -1)
 *(x::Dual, y::Dual) = Dual(x.fun * y.fun, x.fun * y.der + y.fun * x.der)
 
 """
-Sobrecargamos la operación de  (`*`) para dos números `Duales`. La operación que se realiza es la siguiente:
+Sobrecargamos la operación de división (`/`) para dos números `Duales`. La operación que se realiza es la siguiente:
 
 Dual(x₁, x₂) / Dual(y₁,y₂) = Dual(x₁/y₁, (y₁*x₂ - x₁*y₂)/ y₁²)
 
@@ -157,10 +153,8 @@ Dual(3.0, 0.0)
 """
 Dual(x::Real) = Dual(x,0.)
 
-# <div class="alert alert-warning">
-# Parece ser compatible en el sentido de que es como si estuviéramos tomando la derivada de una constante, 
+# Es compatible en el sentido de que es como si estuviéramos tomando la derivada de una constante, 
 # la cuál sabemos que es 0.
-# </div>
 
 # - Extiendan los métodos que permitan sumar/restar y multiplicar/dividir un número (`::Real`) y
 # un `::Dual`. (Recuerden que ciertas operaciones son conmutativas!).
@@ -264,7 +258,7 @@ end
 # implementaron da el resultado que debería ser. Para esto, pueden usar la librería
 # estándard [`Test`](https://docs.julialang.org/en/v1/stdlib/Test/) de Julia.
 
-@test 3. + Dual(4., 8.) == Dual(3. + 4.,8.)
+@test Dual(4.,8.) + 3. == 3. + Dual(4., 8.) == Dual(3. + 4.,8.)
 @test 2. - Dual(3.,6.)  == Dual(2. - 3.,0. - 6.)
 @test Dual(3.,6.) - 2.  == Dual(3. - 2.,6.)
 @test Dual(-4.,3.) / 3. == Dual(-4. /3., (3. *3. - (-4.)*0.) / 3. ^ 2)
