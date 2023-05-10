@@ -1,8 +1,9 @@
 # Tarea 2
 
+# Paqueterías a utilizar
 using Plots, Test
 
-# > Fecha de envío:
+# > Fecha de envío: 8/05/2023
 # >
 # > Fecha de aceptación:
 # >
@@ -13,33 +14,13 @@ using Plots, Test
 # construyan una órbita muy larga, por ejemplo, de $20\,000$ iterados, o más. Obtengan el histograma de frecuencias 
 # (normalizado) de los puntos que la órbita visita.
 
-function trayectoria(f::Function, b::Number, x₀::Number)
-    x_array, y_array = iteramapeo(f, x₀)
-    dibujartrayectoria(f, b, x₀, x_array, y_array)
-end
-
-function trayectoria(f::Function, b::Number, x₀::Number, n_iteraciones::Int)
-    x_array, y_array = iteramapeo(f, x₀, n_iteraciones)
-    dibujartrayectoria(f, b, x₀, x_array, y_array)
-end
-    
-function histograma(f::Function, b::Number, x₀::Number, n_iteraciones::Int)
-    _ , y_array = iteramapeo(f, x₀, n_iteraciones)
-    dibujarhistograma(y_array[3:end], b)
-end
-
-function histograma(f::Function, b::Number, x₀::Array, n_iteraciones::Int)
-    _, big_array = iteramapeo(f, x₀[1], n_iteraciones)
-    big_array = big_array[3:end]
-    for x_0 in x₀[2:end]
-        _, y_array = iteramapeo(f, x_0, n_iteraciones)
-        append!(big_array, y_array[3:end])
-    end
-    dibujarhistograma(big_array, b)
-end
-
-function iteramapeo(f::Function, x₀::Number)
-    ϵ = 0.001
+"""
+Dada una condición inicial, aplicamos una función de manera iterativa hasta que converja a cierta ϵ la distancia entre
+el resultado obtenido y el anterior. Como resultado se obtienen 2 arreglos, uno que contiene el avance de las iteraciones 
+empezando por la condición inicial, mientras que el segundo arreglo contiene cada iteraciones repetida dos veces, sin 
+la condición inicial.
+"""
+function iteramapeo(f::Function, x₀::Number, ϵ::Number = 0.001)
     r = Inf
     xₙ = x₀
 
@@ -48,18 +29,19 @@ function iteramapeo(f::Function, x₀::Number)
     while r > ϵ
         xₙ₊₁ = f(xₙ)
         r = abs(xₙ₊₁ - xₙ)
-        push!(x_array,xₙ,xₙ₊₁)
-        push!(y_array,xₙ₊₁,xₙ₊₁)
+        push!(x_array, xₙ, xₙ₊₁)
+        push!(y_array, xₙ₊₁, xₙ₊₁)
         xₙ = xₙ₊₁
     end
     return x_array, y_array
 end
-
+"""
+Dada una condición inicial, aplicamos una función de manera iterativa hasta cumplir cierto número de iteraciones dado. 
+Como resultado se obtienen 2 arreglos, uno que contiene el avance de las iteraciones empezando por la condición inicial, 
+mientras que el segundo arreglo contiene cada iteraciones repetida dos veces, sin la condición inicial.
+"""
 function iteramapeo(f::Function, x₀::Number, n_iteraciones::Int)
-    ϵ = 0.001
-    r = Inf
     xₙ = x₀
-
     x_array = [x₀]
     y_array = [0.]
     for _ in 1:n_iteraciones
@@ -71,9 +53,14 @@ function iteramapeo(f::Function, x₀::Number, n_iteraciones::Int)
     return x_array, y_array
 end
 
+"""
+Se grafica una función dada de la forma f(x) = x² - b, se toma a [-b, b] como el intervalo de graficación, también
+se grafica la función identidad y = x, y dados dos arreglos generados por la función ´iteramapeo´ se grafican las trayectorias
+generadas por dichos arreglos, que debieron tomar como función y condición inicial, las mismas que se utilizan aquí.
+"""
 function dibujartrayectoria(f::Function, b::Number, x₀::Number, x_array::Array, y_array::Array)
     x = -b:0.01:b
-    plot(x, f.(x), label = "f₁(x) = √x", size=(950,500), lw = 2)
+    plot(x, f.(x), label = "f₁(x) = x² - $b", size=(950,500), lw = 2)
     plot!(x, x, label = "f₂(x) = x", lw = 3)
     xlabel!("xₙ")
     ylabel!("xₙ₊₁")
@@ -81,12 +68,45 @@ function dibujartrayectoria(f::Function, b::Number, x₀::Number, x_array::Array
     scatter!([x₀], [f(x₀)], label = "Condición inicial")
 end
 
+"""
+Se usan las funciones ´iteramapeo´ y ´dibujartrayectoria´ para generar la figura con la convergencia
+de una condición inicial hacia un punto fijo de un mapeo dado. La iteración termina hasta que los 
+resultados de iterar convergan entre sí a cierta distancia dada.
+"""
+function trayectoria(f::Function, b::Number, x₀::Number)
+    x_array, y_array = iteramapeo(f, x₀)
+    dibujartrayectoria(f, b, x₀, x_array, y_array)
+end
+
+"""
+Se usan las funciones ´iteramapeo´ y ´dibujartrayectoria´ para generar la figura con la convergencia
+de una condición inicial hacia un punto fijo de un mapeo dado. La iteración termina hasta completar un
+número de iteraciones dado.
+"""
+function trayectoria(f::Function, b::Number, x₀::Number, n_iteraciones::Int)
+    x_array, y_array = iteramapeo(f, x₀, n_iteraciones)
+    dibujartrayectoria(f, b, x₀, x_array, y_array)
+end
+
+"""
+Creamos un histograma con los resultados de las iteraciones dadas por la función ´iteramapeo´
+"""
 function dibujarhistograma(y_array::Array, b::Number)
     y_visitas = (y_array[1:2:end] .+ b) ./ (2b)
-    #y_visitas = y_array[1:2:end]
     histogram(y_visitas, bins=100, title="Histograma de frecuencias para f(x)=x² - $b", label=false)
 end
 
+"""
+Se usan las funciones ´iteramapeo´ y ´dibujarhistograma´ para obtener los resultados de la iteración del 
+mapeo dado de la forma f(x) = x^2 -b con cierta condición inicial dada y un número de iteraciones, y de este
+modo poder dibujar un histograma normalizado con los resultados de haber iterado el mapeo mencionado.
+"""
+function histograma(f::Function, b::Number, x₀::Number, n_iteraciones::Int)
+    _ , y_array = iteramapeo(f, x₀, n_iteraciones)
+    dibujarhistograma(y_array[3:end], b)
+end
+
+# #Definimos el mapeo y nuestra condición inicial
 b = 2
 f(x) = x^2 - b
 x₀ = 0.4
@@ -98,6 +118,22 @@ histograma(f, b, x₀, n_iteraciones)
 
 # (b) Repitan el ejercicio anterior pero considerando muchas condiciones iniciales, pero pocos iterados (~50).
 
+"""
+Se usan las funciones ´iteramapeo´ y ´dibujarhistograma´ para obtener los resultados de la iteración del 
+mapeo dado de la forma f(x) = x^2 -b con un arreglo de condiciones iniciales dado y un número de iteraciones, y de este
+modo poder dibujar un histograma normalizado con los resultados de haber iterado el mapeo mencionado.
+"""
+function histograma(f::Function, b::Number, x₀::Array, n_iteraciones::Int)
+    _, big_array = iteramapeo(f, x₀[1], n_iteraciones)
+    big_array = big_array[3:end]
+    for x_0 in x₀[2:end]
+        _, y_array = iteramapeo(f, x_0, n_iteraciones)
+        append!(big_array, y_array[3:end])
+    end
+    dibujarhistograma(big_array, b)
+end
+
+# #Definimos un intervalo de condiciones iniciales válido.
 n_condiciones_iniciales = 40
 n_iteraciones = 50
 x₀ = 2b .* (rand(n_condiciones_iniciales)) .- b
@@ -126,7 +162,21 @@ using .NumDual
 # debe ser calculada a través de los números duales. Obtengan usando esta implementación un cero de $f(x) = x^3 - 8$, para
 # verificar que su implementación funciona.
 
-function metodonewton(func, x₀, n_iteraciones)
+"""
+Método de Newton-Raphson numérico utilizando diferenciación automática con números duales. Recibe
+una función, una condición inicial y un número de iteraciones como argumentos.
+
+# Ejemplos
+
+```julia-repl
+julia> metodonewton(x -> x^2 - 2., 2.3, 30)
+1.4142135623730951
+
+julia> metodonewton(x -> x - 2, 0.1, 30)
+2.0
+```
+"""
+function metodonewton(func::Function , x₀::Number, n_iteraciones::Int)
     xₙ = x₀
     xₙ₊₁ = 0.
     for _ in 1:n_iteraciones
@@ -140,6 +190,7 @@ function metodonewton(func, x₀, n_iteraciones)
     return xₙ₊₁
 end
 
+# #Definimos el mape, las condiciones iniciales y el número de iteraciones
 f(x) = x^3 - 8.
 x₀ = 2.3
 n_iteraciones = 30
@@ -150,19 +201,37 @@ raiz = metodonewton(f, x₀, n_iteraciones)
 # (c) Encuentren *todos* los puntos fijos del mapeo $F(x) = x^2 - 1.1$ usando la función que implementaron para el método 
 # de Newton.
 
+# #Definimos el mapeo y luego la función para encontrar puntos fijos.
 F(x) = x^2 - 1.1
 G(x) = F(x) - x
 
+# #Definimos condiciones iniciales y número de iteraciones para la primera raiz.
 x₀₁ = 10.
 n_iteraciones = 30
 raiz_1 = metodonewton(G, x₀₁, n_iteraciones)
 
+# #Definimos una condición inicial distinta para encontrar la otra raiz.
 x₀₂ = -0.1
 raiz_2 = metodonewton(G, x₀₂, n_iteraciones)
 
 # (d) Encuentren los puntos *de periodo 2* para el mapeo $F(x) = x^2 - 1.1$ usando la función que implementaron para el 
 # método de Newton.
 
+
+"""
+Función para encontrar raices de un mapeo G pero evitando raices anteriores que se le pasan como un arreglo, esto
+con el fin de filtrar los puntos fijos de anteriores periodos.
+Se generan condiciones iniciales aleatorias para encontrar el mayor número de raíces posibles.
+
+# Ejemplo
+
+```julia-repl
+julia> findroots(x -> ((x^2)-1.1)^2 - 1.1 - x, [1.661895003862225, -0.6618950038622251], 30)
+2-element Vector{Float64}:
+ -1.0916079783099617
+  0.0916079783099617
+```
+"""
 function findroots(G::Function, puntos_fijos_anteriores::Vector, n_iteraciones::Int, n_condiciones_iniciales::Int = 100)
     roots = Float64[]
     for x_0 in 10*rand(n_condiciones_iniciales) .- 5
@@ -190,14 +259,19 @@ function findroots(G::Function, puntos_fijos_anteriores::Vector, n_iteraciones::
     return roots
 end
 
+# #Se genera el mapeo del cual conocer los puntos fijos y cuántas veces iteraremos en el método de Newton.
 n_iteraciones = 30
-G₂(x) = ∘([F for _ in 1:2]...)(x) - x
+G₂(x) = F(F(x)) - x
 puntos_fijos_anteriores = [raiz_1, raiz_2]
 puntos_periodo_2 = findroots(G₂, puntos_fijos_anteriores, n_iteraciones)
 
 # (e) Usen los números duales para mostrar que los puntos de periodo 2 para el mapeo $F(x) = x^2 -1$ son linealmente
 # estables (atractivos).
 
+"""
+Función para encontrar raices de un mapeo G.
+Se generan condiciones iniciales aleatorias para encontrar el mayor número de raíces posibles.
+"""
 function findroots(G::Function, n_iteraciones::Int, n_condiciones_iniciales::Int = 100)
     roots = Float64[]
     for x_0 in 10*rand(n_condiciones_iniciales) .- 5
@@ -221,6 +295,9 @@ function findroots(G::Function, n_iteraciones::Int, n_condiciones_iniciales::Int
     return roots
 end
 
+"""
+Función para poder generalizar y no tener que insertar las raices de periodos anteriores.
+"""
 function puntosperiodon(f, n, n_iteraciones = 30)
     roots = []
     puntos_anteriores_periodos = []
@@ -275,8 +352,22 @@ end
 # Aproximen el valor al que converge esta secuencia,
 # es decir, dar una estimación de $\delta = f_\infty$.
 
+# #Definimos el mapeo original
 Q(x, c) = x^2 - c
 
+"""
+Definimos la composición del mapeo Q bajo un número dado de composiciones.
+
+# Ejemplos
+
+```julia-repl
+julia> Qn(0., 2., 2)
+2.0
+
+julia> Qn(1., 3., 4)
+1.0
+```
+"""
 function Qn(x,c,n_composiciones)
     x₀ = x
     for i = 1:n_composiciones
@@ -286,6 +377,13 @@ function Qn(x,c,n_composiciones)
     return x₀
 end
 
+"""
+Mediante el método de Newton encontramos la raíz de una función pero filtrando en caso
+de ya haber obtenido esa raíz a partir de un arreglo. La condición inicial para
+el método de Newton se va obteniendo incrementando el valor de la condición
+inicial tomando la distnacia entre las últimas dos condiciones inicales y dividiendo
+entre 4.
+"""
 function findfirstroot(f::Function, anteriores_raices::Array; n_iteraciones::Int=30)
     last_root = anteriores_raices[end]
     if length(anteriores_raices) == 1
@@ -294,25 +392,52 @@ function findfirstroot(f::Function, anteriores_raices::Array; n_iteraciones::Int
         step = last_root + (last_root - anteriores_raices[end-1])/4
     end
     x_0 = step
-    #@show step
     root = last_root
     while sum(root .≈ anteriores_raices) > 0
         root = metodonewton(f, x_0, n_iteraciones)
-        #@show x_0, root
         x_0 += step
     end
     return root
 end
 
+"""
+Utiliza las funciones ´findroots´ y ´findroots´ para encontrar los puntos fijos
+del mapeo Qn compuesto un número n de veces dado. Se tiene que poner las raíces 
+anteriores para no repetir suponiendo un perido anterior.
+"""
 function findcn(n::Int, anteriores_raices::Array; n_iteraciones::Int=300)
     if length(anteriores_raices) < 1
-        #println("Nos encontramos en el caso donde n = 0")
         return findroots(c -> Qn(0.0, c, 2^n), n_iteraciones)
     else
         return findfirstroot(c -> Qn(0.0, c, 2^n), anteriores_raices, n_iteraciones=n_iteraciones)
     end
 end
 
+
+"""
+Se hace uso de la función ´findcn´ para encontrar las raíces del mapeo Qn
+variando el valor de c e iterando sobre distintos periodos. Como un punto crítico de 
+periodo n es igual de periodo 2n, entonces vamos guardando los puntos críticos que 
+encontramos para así no repetir en las iteraciones posteriores.
+
+# Ejemplos
+
+```julia-repl
+julia> findallcn(2)
+3-element Vector{Float64}:
+ 0.0
+ 1.0
+ 1.3107026413368328
+
+julia> findallcn(4)
+5-element Vector{Float64}:
+ 0.0
+ 1.0
+ 1.3107026413368328
+ 1.3815474844320617
+ 1.3969453597045602
+```
+"""
 function findallcn(ns::Int; n_iteraciones::Int=300)
     anterior = Float64[]
     for n = 0:ns
@@ -328,7 +453,7 @@ n = 12
 cns = findallcn(n)
 fn = [(cns[i] - cns[i+1]) / (cns[i+1] - cns[i+2]) for i = 1:length(cns)-2]
 
-plot(1:n-1, fn)
+# Observamos que tiene a un valor cercano a 4.669.
 
 # El valor $f_{n}$ tiende a una constante cuando $n \rightarrow \infty$.
 
@@ -342,3 +467,5 @@ plot(1:n-1, fn)
 # en el límite de $n$ muy grande.
 
 α = [-cns[i]/cns[i+1] for i = 1:length(cns)-1]
+
+# Observamos que tiende a -1
