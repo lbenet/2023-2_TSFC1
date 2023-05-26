@@ -8,7 +8,7 @@ using Plots, Test
 # > Fecha de aceptación:
 # >
 
-## Ejercicio 1
+# # Ejercicio 1
 
 # (a) Consideren el mapeo $F(x) = x^2-2$ definido en $-2 \leq x \leq 2$. A partir de una condición inicial tomada al azar, 
 # construyan una órbita muy larga, por ejemplo, de $20\,000$ iterados, o más. Obtengan el histograma de frecuencias 
@@ -92,8 +92,7 @@ end
 Creamos un histograma con los resultados de las iteraciones dadas por la función ´iteramapeo´
 """
 function dibujarhistograma(y_array::Array, b::Number)
-    y_visitas = (y_array[1:2:end] .+ b) ./ (2b)
-    histogram(y_visitas, bins=100, title="Histograma de frecuencias para f(x)=x² - $b", label=false)
+    histogram(y_array, bins=100, title="Histograma de frecuencias para f(x)=x² - $b", label=false, normed=true)
 end
 
 """
@@ -106,7 +105,7 @@ function histograma(f::Function, b::Number, x₀::Number, n_iteraciones::Int)
     dibujarhistograma(y_array[3:end], b)
 end
 
-# #Definimos el mapeo y nuestra condición inicial
+# Definimos el mapeo y nuestra condición inicial
 b = 2
 f(x) = x^2 - b
 x₀ = 0.4
@@ -133,7 +132,7 @@ function histograma(f::Function, b::Number, x₀::Array, n_iteraciones::Int)
     dibujarhistograma(big_array, b)
 end
 
-# #Definimos un intervalo de condiciones iniciales válido.
+# Definimos un intervalo de condiciones iniciales válido.
 n_condiciones_iniciales = 40
 n_iteraciones = 50
 x₀ = 2b .* (rand(n_condiciones_iniciales)) .- b
@@ -142,9 +141,11 @@ histograma(f, b, x₀, n_iteraciones)
 # (c) ¿Qué conclusión podemos sacar de los histogramas en ambos casos?
 
 # Observamos que con muchas iteraciones y una condición inicial recorremos el espacio más _uniforme_ que
-# con varias condiciones iniciales y pocas iteraciones.
+# con varias condiciones iniciales y pocas iteraciones. Observamos que hay un umbral donde al cierto número 
+# más grande de condiciones inicales en el inciso b, se vuelve más uniforme. Sin embargo, se ocupan más recursos 
+# y tiempo con un número de operaciones similares.
 
-# ## Ejercicio 2
+# # Ejercicio 2
 
 # a) Usando lo que hicieron en la Tarea 1, incluyan lo que desarrollaron para los números `Dual`es en un módulo que 
 # llamaremos `NumDual` de Julia ([ver la documentación aquí](https://docs.julialang.org/en/v1/manual/modules/)). 
@@ -186,11 +187,11 @@ function metodonewton(func::Function , x₀::Number, n_iteraciones::Int)
         xₙ₊₁ = xₙ - g / g′
         xₙ = xₙ₊₁
     end
-    
+    xₙ₊₁ = isapprox(xₙ₊₁, 0.0, atol=0.000001) ? 0.0 : xₙ₊₁
     return xₙ₊₁
 end
 
-# #Definimos el mape, las condiciones iniciales y el número de iteraciones
+# Definimos el mapeo, las condiciones iniciales y el número de iteraciones
 f(x) = x^3 - 8.
 x₀ = 2.3
 n_iteraciones = 30
@@ -201,7 +202,7 @@ raiz = metodonewton(f, x₀, n_iteraciones)
 # (c) Encuentren *todos* los puntos fijos del mapeo $F(x) = x^2 - 1.1$ usando la función que implementaron para el método 
 # de Newton.
 
-# #Definimos el mapeo y luego la función para encontrar puntos fijos.
+# Definimos el mapeo y luego la función para encontrar puntos fijos.
 F(x) = x^2 - 1.1
 G(x) = F(x) - x
 
@@ -210,7 +211,7 @@ x₀₁ = 10.
 n_iteraciones = 30
 raiz_1 = metodonewton(G, x₀₁, n_iteraciones)
 
-# #Definimos una condición inicial distinta para encontrar la otra raiz.
+# Definimos una condición inicial distinta para encontrar la otra raiz.
 x₀₂ = -0.1
 raiz_2 = metodonewton(G, x₀₂, n_iteraciones)
 
@@ -259,7 +260,7 @@ function findroots(G::Function, puntos_fijos_anteriores::Vector, n_iteraciones::
     return roots
 end
 
-# #Se genera el mapeo del cual conocer los puntos fijos y cuántas veces iteraremos en el método de Newton.
+# Se genera el mapeo del cual conocer los puntos fijos y cuántas veces iteraremos en el método de Newton.
 n_iteraciones = 30
 G₂(x) = F(F(x)) - x
 puntos_fijos_anteriores = [raiz_1, raiz_2]
@@ -274,20 +275,13 @@ Se generan condiciones iniciales aleatorias para encontrar el mayor número de r
 """
 function findroots(G::Function, n_iteraciones::Int, n_condiciones_iniciales::Int = 100)
     roots = Float64[]
-    for x_0 in 10*rand(n_condiciones_iniciales) .- 5
+    for x_0 in 2*rand(n_condiciones_iniciales)
         raiz = metodonewton(G, x_0, n_iteraciones)
+        raiz = isapprox(raiz, 0.0, atol=0.000001) ? 0.0 : raiz
         if isempty(roots)
             push!(roots, raiz)
         else
-            counter = 0
-            for root in roots
-                if root ≈ raiz
-                    continue
-                else
-                    counter += 1
-                end
-            end
-            if counter == length(roots)
+            if iszero(sum(isapprox.(raiz, roots, atol = 0.000001)))
                 push!(roots, raiz)
             end
         end
@@ -311,7 +305,7 @@ function puntosperiodon(f, n, n_iteraciones = 30)
     puntos_periodo_n = []
     for root in roots
         if length(puntos_anteriores_periodos) > 0
-            if sum(isapprox.(root, puntos_anteriores_periodos)) == 0
+            if iszero(sum(isapprox.(root, puntos_anteriores_periodos)))
                 push!(puntos_periodo_n, root)
             end
         else
@@ -334,7 +328,7 @@ end
 # Al evaluar los puntos de periodo 2 en la derivada de la función, vemos que todo es, en valor absoluto, menor que 1. Más aún, 
 # son iguales a cero! Lo que significa que sería un _mínimo_ o un _máximo_.
 
-## Ejercicio 3
+# # Ejercicio 3
 
 # Llamaremos $c_n$ al valor del parámetro $c$ para el mapeo cuadrático
 # $Q_c(x) = x^2-c$, donde ocurre el ciclo superestable de periodo $2^n$,
@@ -393,7 +387,7 @@ function findfirstroot(f::Function, anteriores_raices::Array; n_iteraciones::Int
     end
     x_0 = step
     root = last_root
-    while sum(root .≈ anteriores_raices) > 0
+    while sum(isapprox.(root, anteriores_raices, atol = 0.000001)) > 0
         root = metodonewton(f, x_0, n_iteraciones)
         x_0 += step
     end
@@ -447,9 +441,7 @@ function findallcn(ns::Int; n_iteraciones::Int=300)
     return anterior
 end
 
-findallcn(8)
-
-n = 12
+n = 9
 cns = findallcn(n)
 fn = [(cns[i] - cns[i+1]) / (cns[i+1] - cns[i+2]) for i = 1:length(cns)-2]
 
@@ -466,6 +458,61 @@ fn = [(cns[i] - cns[i+1]) / (cns[i+1] - cns[i+2]) for i = 1:length(cns)-2]
 # \end{equation*}
 # en el límite de $n$ muy grande.
 
-α = [-cns[i]/cns[i+1] for i = 1:length(cns)-1]
+# Habrá que hacer prácticamente lo mismo que hicimos arriba, pero ahora en lugar de tener a c como la variable, más bien será x.
 
-# Observamos que tiende a -1
+"""
+Obtenemos las raíces estables de un mapeo utilizando la propiedad de la primera derivada.
+"""
+function stableroots(f::Function, x::Array)
+    xd = NumDual.vardual.(x)
+    f_duals = f.(xd)
+    f′ = [f_dual.der for f_dual in f_duals]
+    f′ = f′[x .< 0.5]
+    x = x[x .< 0.5]
+    stables = x[(abs.(f′) .≈ 1) .|| abs.(f′) .> 1. ]
+    return stables
+end
+
+"""
+De entre un arreglo se devuelve el número más cercano a un valor dado.
+"""
+findnearest(A::Vector,x::Real) = findmin(abs.(A .- x))[2]
+
+function findsmallestroot(f::Function, n_condiciones_iniciales::Int=300; n_iteraciones::Int=30)
+    x0 = 2*rand(n_condiciones_iniciales)
+    roots = union(metodonewton.(f, x0, n_iteraciones))
+    roots = filter(n -> !(n ≈ 0), roots)
+    stable_roots = stableroots(f, roots)
+    root = stable_roots[findnearest(stable_roots, 0.)]
+    return root
+end
+
+"""
+Para encontrar una raíz de un mapeo dado. Teniendo en cuenta una condición inicial
+y el periodo.
+"""
+function findxn(cns::Array, n::Int, anteriores_raices::Array; n_iteraciones::Int=300)
+    if length(anteriores_raices) < 1
+        return findroots(x -> Qn(x, 0.0, 2^n), n_iteraciones)
+    else
+        return findsmallestroot(x -> Qn(x, cns[n+1], 2^n) - x, n_iteraciones=n_iteraciones)
+    end
+end
+
+"""
+Para encontrar todas las raíces del mapeo pero ahora respecto a x.
+"""
+function findallxn(cns::Array, ns::Int; n_iteraciones::Int=300)
+    raices = Float64[]
+    for n = 0:ns
+        xn = findxn(cns, n, raices; n_iteraciones)
+        push!(raices, xn[1])
+    end
+    return raices
+end
+
+xns = findallxn(cns, n)
+
+α = [-xns[i]/xns[i+1] for i = 1:length(xns)-1]
+
+# Observamos que tiende a `2.5029`.
